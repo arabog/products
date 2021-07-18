@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <meta charset="UTF-8">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+          <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+          <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+
+          <title>Expmt</title>
+</head>
+<body>
+          <div id="root"></div>
+
+          <script type= "text/babel">
+
+                    class ProductCategoryRow extends React.Component {
+
+                              // get route: get category weda sporting gds or electronics
+                              render() {
+                                        const category = this.props.category;
+
+                                        // th = table header cell
+                                        return (
+                                        <tr>
+                                                  <th colSpan="2">  {  category  } </th>
+                                        </tr>
+                                        );
+                              }
+                    }
+
+                    class ProductRow extends React.Component {
+
+                              // get route: get each product name and price 
+                              // & indicate weda dy r stocked or not
+                              render() {
+                                        const product = this.props.product;
+                              //   const name = product.name;
+
+                                        const name = product.stocked 
+                                        ? product.name 
+                                        :<span style={{color: 'red'}}>
+                                                            {product.name}
+                                        </span>;
+
+                                        // td = table data cell
+                                        return (
+                                        <tr>
+                                                  <td>{name}</td>
+                                                  <td>{product.price}</td>
+                                        </tr>
+                                        );
+                              }
+                    }
+
+                    class ProductTable extends React.Component {
+                              render() {
+                                        // section 4tm inside
+                                        const rows = [];
+                                        let lastCategory = null;
+
+                                        // section 4tm outside
+                                        const inputVal = this.props.inputVal;
+                                        const checkVal = this.props.checkVal;
+
+                                        this.props.products.forEach((product) => {
+                                                  // section 4tm outside
+                                                  if (product.name.indexOf(inputVal) === -1) {
+                                                            return;
+                                                  }
+
+                                        /*                                                   
+                                                  without ds conditn d whole products r rendered but
+                                                  d checkbox is non-fxnal
+
+                                                  checkVal alone shows
+                                                  all products wn d checked box is unchecked
+                                                  and non wn checked
+
+                                                  !checkVal shows no product wn box is unchecked
+                                                  & all products wn d box is checked
+
+                                                  product.stocked alone show unstocked products
+                                                  wh box is unchecked. wn checked it doesn't change
+
+                                                  !product.stocked alone show stocked products
+                                                  wh box is unchecked. wn checked it doesn't change
+
+
+                                                  **************************
+                                                  checkVal alone shows
+                                                  all products wn d checked box is unchecked
+                                                  and non wn checked
+
+                                                  !product.stocked alone show stocked products
+                                                  wh box is unchecked. wn checked it doesn't change
+
+                                        */
+                                                  if ( checkVal && !product.stocked) {  
+                                                            return;
+                                                  }
+
+                                                  // section 4tm outside
+                                                  if (product.category !== lastCategory) {
+                                                            rows.push(
+                                                                      <ProductCategoryRow
+                                                                                key={product.category} 
+                                                                                category={product.category}
+                                                                      />
+                                                            );
+
+                                                  }
+
+                                                  rows.push(
+                                                            <ProductRow
+                                                                      key={product.name}
+                                                                      product={product}
+                                                            />
+                                                  );
+
+                                                  lastCategory = product.category;
+                                        });
+
+                                        return (
+                                                  <table>
+                                                            <thead>
+                                                                      <tr>
+                                                                                <th>Name</th>
+                                                                                <th>Price</th>
+                                                                      </tr>
+                                                            </thead>
+
+                                                            <tbody>{rows}</tbody>
+                                                  </table>
+                                        );
+                              }
+                    }
+
+                    class SearchBar extends React.Component {
+                              constructor(props) {
+                                        super(props);
+                              }
+
+                              // 4rm outside    
+                              handleInputChange = (e) => {
+                                        this.props.inputValueChange(e.target.value);
+                              }
+                              
+                              handleStockChange = (e) => {
+                                        this.props.stockChange(e.target.checked);
+                              }
+                              
+                              render() {
+                                        return (
+                                                  <form>
+                                                            <input
+                                                                      type="text"
+                                                                      placeholder="Search..."
+                                                                      value={this.props.inputVal}
+                                                                      onChange={this.handleInputChange}
+                                                            />
+
+                                                            <p>
+                                                                      <input
+                                                                                type="checkbox"
+                                                                                checked={this.props.checkVal}
+                                                                                onChange={this.handleStockChange}
+                                                                      />
+
+                                                                      {' '}
+
+                                                                      Only show products in stock
+                                                            </p>
+                                                  </form>
+                                        );
+                              }
+                    }
+
+                    class FilterableProductTable extends React.Component {
+                              constructor(props) {
+                                        super(props);
+
+                                        this.state = {
+                                                  inputVal: '',
+                                                  checkVal: false // r we showing only d stocked product? false
+                                        };
+                              
+                              }
+
+                              handleInputChange = (input) => {
+                                        this.setState({
+                                                  inputVal: input
+                                        });
+                              }
+                              
+                              handleStockChange = (val) => {
+                                        this.setState( {
+                                                  checkVal: val
+                                        })
+                              }
+
+                              render() {
+                                        return (
+                                        <div>
+                                                  <SearchBar
+                                                            // input box
+                                                            inputVal={this.state.inputVal}
+                                                            inputValueChange={this.handleInputChange}
+
+                                                            // check box
+                                                            checkVal={this.state.checkVal}
+                                                            stockChange={this.handleStockChange}
+                                                  />
+
+                                                  <ProductTable
+                                                            products={this.props.products}
+                                                            inputVal={this.state.inputVal}
+                                                            checkVal={this.state.checkVal}
+                                                  />
+                                        </div>
+                                        );
+                              }
+                    }
+
+
+                    const PRODUCTS = [
+                              {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
+                              {category: 'Sporting Goods', price: '$9.99', stocked: true, name: 'Baseball'},
+                              {category: 'Sporting Goods', price: '$29.99', stocked: false, name: 'Basketball'},
+                              {category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch'},
+                              {category: 'Electronics', price: '$399.99', stocked: false, name: 'iPhone 5'},
+                              {category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7'},
+                              {category: 'Antibiotics', price: '$19.99', stocked: false, name: 'Septrin'},
+                              {category: 'Antibiotics', price: '$100', stocked: true, name: 'Augmentin'},
+                              {category: 'Antibiotics', price: '$229.99', stocked: true, name: 'Amoxillin'},
+                    ];
+
+                    ReactDOM.render(
+                              // <ProductTable products={PRODUCTS} />,
+                              <FilterableProductTable products={PRODUCTS} />,
+                              document.getElementById('root')
+                    );
+          </script>
+</body>
+</html>
