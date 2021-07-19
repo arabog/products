@@ -1,0 +1,24 @@
+.table {
+          width: 50;
+          height: 50px;
+          margin-bottom: 30px;
+}
+ 
+.row {
+          display: flex;
+          flex-direction: column;
+          margin: 9px 0 18px;
+          border: 2px solid black;
+          border-radius: 5px;
+          padding: 4px 10px;
+}
+
+.row a {
+          text-align: right;
+          text-decoration: none;
+}
+
+.name {
+          font-size: 15px;
+}
+

@@ -8,21 +8,21 @@
           <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
           <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+          <link rel="stylesheet" href="styles.css">
 
-          <title>Hello World</title>
+          <title>Job Search</title>
 </head>
 <body>
           <div id="root"></div>
 
           <script type= "text/babel">
 
-                class ProductCategoryRow extends React.Component {
+                class JobCategoryRow extends React.Component {
 
-                        // get route: get category weda sporting or electronics
+                        // get route: get job category 
                         render() {
                                 const category = this.props.category;
 
-                                // th = table header cell
                                 return (
                                         <tr>
                                                 <th colSpan="2">  {  category  } </th>
@@ -31,75 +31,80 @@
                         }
                 }
 
-                class ProductRow extends React.Component {
+                class JobRow extends React.Component {
 
-                        // get route: get each product name and price 
-                        // & indicate weda dy r stocked or not
+                        // get route: get each job name and salary 
+                        // & indicate weda dy r available or not
                         render() {
-                                const product = this.props.product;
+                                const job = this.props.job;
 
-                                const name = product.stocked 
-                                        ? product.name 
+                                const name = job.available 
+                                        ? job.name 
                                         :<span style={{color: 'red'}}>
-                                                        {product.name}
+                                                        {job.name}
                                         </span>;
 
                                 // td = table data cell
                                 return (
-                                        <tr>
-                                                <td>{name}</td>
-                                                <td>{product.price}</td>
-                                        </tr>
+                                        <div  className="table">
+                                                <tr className="row">
+                                                        <td className="name">{name}</td>
+                                                        <td className="salary">{job.salary}</td>
+                                                        
+                                                        <a href="#">More info</a>
+                                                </tr>
+
+                                        </div>
                                 );
                         }
                 }
 
-                class ProductTable extends React.Component {
+                class JobTable extends React.Component {
                         render() {
                                 // section 4tm inside
                                 const rows = [];
                                 let lastCategory = null;
 
                                 // section 4tm outside
-                                const filterText = this.props.filterText;
-                                const inStockOnly = this.props.inStockOnly;
+                                const inputVal = this.props.inputVal;
+                                const availJobs = this.props.availJobs;
 
-                                this.props.products.forEach((product) => {
+                                this.props.jobs.forEach((job) => {
                                         // section 4tm outside
-                                        if (product.name.indexOf(filterText) === -1 && product.category.indexOf(filterText) === -1) {
+                                        if (job.name.indexOf(inputVal) === -1 && job.category.indexOf(inputVal) === -1) {
                                                 return;
                                         }
 
-                                        if (inStockOnly && !product.stocked) {
+                                        if (availJobs && !job.available) {
                                                 return;
                                         }
 
                                         // section 4tm outside
-                                        if (product.category !== lastCategory) {
+                                        if (job.category !== lastCategory) {
                                                 rows.push(
-                                                        <ProductCategoryRow
-                                                                category={product.category}
-                                                                key={product.category} 
+                                                        <JobCategoryRow
+                                                                category={job.category}
+                                                                key={job.category} 
                                                         />
                                                 );
                                         }
 
                                         rows.push(
-                                                <ProductRow
-                                                        product={product}
-                                                        key={product.name}
+                                                <JobRow
+                                                        job={job}
+                                                        key={job.name}
                                                 />
                                         );
 
-                                        lastCategory = product.category;
+                                        lastCategory = job.category;
                                 });
 
                                 return (
                                         <table>
                                                 <thead>
                                                         <tr>
-                                                                <th>Name</th>
-                                                                <th>Price</th>
+                                                                <th>Jobs</th>
+                                                                <th>Salary</th>
                                                         </tr>
                                                 </thead>
 
@@ -111,17 +116,17 @@
 
                 class SearchBar extends React.Component {
                         constructor(props) {
+
                                 super(props);
-                                this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
-                                this.handleInStockChange = this.handleInStockChange.bind(this);
+                                
                         }
                         
-                        handleFilterTextChange(e) {
-                                this.props.onFilterTextChange(e.target.value);
+                        handleTextChange = (e)=> {
+                                this.props.inputValChange(e.target.value);
                         }
                         
-                        handleInStockChange(e) {
-                                this.props.onInStockChange(e.target.checked);
+                        handleJobChange = (e)=> {
+                                this.props.jobChange(e.target.checked);
                         }
                         
                         render() {
@@ -129,49 +134,47 @@
                                         <form>
                                                 <input
                                                         type="text"
-                                                        placeholder="Search..."
-                                                        value={this.props.filterText}
-                                                        onChange={this.handleFilterTextChange}
+                                                        placeholder="Search by Job name or category..."
+                                                        value={this.props.inputVal}
+                                                        onChange={this.handleTextChange}
                                                 />
 
                                                 <p>
                                                         <input
                                                                 type="checkbox"
-                                                                checked={this.props.inStockOnly}
-                                                                onChange={this.handleInStockChange}
+                                                                checked={this.props.availJobs}
+                                                                onChange={this.handleJobChange}
                                                         />
 
                                                         {' '}
 
-                                                        Only show products in stock
+                                                        Only show jobs available
                                                 </p>
                                         </form>
                                 );
                         }
                 }
 
-                class FilterableProductTable extends React.Component {
+                class FilterableJobTable extends React.Component {
                         constructor(props) {
                                 super(props);
 
                                 this.state = {
-                                                filterText: '',
-                                                inStockOnly: false
+                                                inputVal: '',
+                                                availJobs: false
                                 };
                         
-                                this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
-                                this.handleInStockChange = this.handleInStockChange.bind(this);
                         }
 
-                        handleFilterTextChange(filterText) {
+                        handleTextChange = (value) => {
                                 this.setState({
-                                                filterText: filterText
+                                                inputVal: value
                                 });
                         }
                         
-                        handleInStockChange(inStockOnly) {
+                        handleJobChange = (value) => {
                                 this.setState({
-                                                inStockOnly: inStockOnly
+                                                availJobs: value
                                 })
                         }
 
@@ -179,16 +182,17 @@
                                 return (
                                         <div>
                                                 <SearchBar
-                                                        filterText={this.state.filterText}
-                                                        inStockOnly={this.state.inStockOnly}
-                                                        onFilterTextChange={this.handleFilterTextChange}
-                                                        onInStockChange={this.handleInStockChange}
+                                                        inputVal={this.state.inputVal}
+                                                        inputValChange={this.handleTextChange}
+                                                        
+                                                        availJobs={this.state.availJobs}
+                                                        jobChange={this.handleJobChange}
                                                 />
 
-                                                <ProductTable
-                                                        products={this.props.products}
-                                                        filterText={this.state.filterText}
-                                                        inStockOnly={this.state.inStockOnly}
+                                                <JobTable
+                                                        jobs={this.props.jobs}
+                                                        inputVal={this.state.inputVal}
+                                                        availJobs={this.state.availJobs}
                                                 />
                                         </div>
                                 );
@@ -196,17 +200,23 @@
                 }
 
 
-                const PRODUCTS = [
-                        {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
-                        {category: 'Sporting Goods', price: '$9.99', stocked: true, name: 'Baseball'},
-                        {category: 'Sporting Goods', price: '$29.99', stocked: false, name: 'Basketball'},
-                        {category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch'},
-                        {category: 'Electronics', price: '$399.99', stocked: false, name: 'iPhone 5'},
-                        {category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7'}
+                const JOBOFFERS = [
+                        {category: 'Design', salary: '$49.99', available: true, name: 'Ui'},
+                        {category: 'Design', salary: '$9.99', available: true, name: 'Ux'},
+                        {category: 'Design', salary: '$29.99', available: false, name: 'Ui/Ux'},
+                        {category: 'Frontend Developer', salary: '$99.99', available: true, name: 'Basics'},
+                        {category: 'Frontend Developer', salary: '$299.99', available: false, name: 'Basics with Framework'},
+                        {category: 'Frontend Developer', salary: '$499.99', available: true, name: 'Basics with Frameworks'},
+                        {category: 'Backend Developer', salary: '$800', available: false, name: 'Node'},
+                        {category: 'Backend Developer', salary: '$850', available: true, name: 'Python'},
+                        {category: 'Backend Developer', salary: '$1000', available: true, name: 'Php'},
+                        {category: 'Fullstack Developer', salary: '$2000', available: true, name: 'Frontend with Node'},
+                        {category: 'Fullstack Developer', salary: '$1850', available: true, name: 'Frontend with Php'},
+                        {category: 'Fullstack Developer', salary: '$2200', available: false, name: 'Frontend with Python'},
                 ];
 
                 ReactDOM.render(
-                        <FilterableProductTable products={PRODUCTS} />,
+                        <FilterableJobTable jobs={JOBOFFERS} />,
                         document.getElementById('root')
                 );
           </script>
