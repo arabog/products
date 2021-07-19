@@ -122,7 +122,9 @@
                         }
                         
                         handleTextChange = (e)=> {
-                                this.props.inputValChange(e.target.value);
+                                this.props.inputValChange(e.target.value
+                                                .replace(/\b\w/g, c => c.toUpperCase())
+                                );
                         }
                         
                         handleJobChange = (e)=> {
